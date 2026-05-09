@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>小小自然探险家 - 科学课互动游戏</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Heiti SC", system-ui, sans-serif;
+    background: linear-gradient(135deg, #fef9c3 0%, #fce7f3 50%, #cffafe 100%);
+    color: #1f2937;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* ============ 顶部 ============ */
+  .topbar {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(8px);
+    border-bottom: 2px solid rgba(0,0,0,0.05);
+  }
+  .title {
+    font-size: 26px;
+    font-weight: 800;
+    background: linear-gradient(90deg,#f59e0b,#ef4444,#8b5cf6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 2px;
+  }
+  .scene-selector { display: flex; gap: 10px; }
+  .scene-btn {
+    padding: 8px 16px;
+    border: 2px solid #cbd5e1;
+    border-radius: 999px;
+    background: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #475569;
+  }
+  .scene-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+  .scene-btn.active {
+    background: linear-gradient(135deg,#f59e0b,#ef4444);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(239,68,68,0.35);
+  }
+
+  /* ============ 主体布局 ============ */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 16px;
+    height: calc(100vh - 64px);
+  }
+
+  /* ============ 左侧场景 ============ */
+  .scene-card {
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    transition: background 0.6s ease;
+  }
+  .scene-card .scene-emojis {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .scene-card .floater {
+    position: absolute;
+    font-size: 64px;
+    opacity: 0.85;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+    animation: floaty 6s ease-in-out infinite;
+  }
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-12px) rotate(3deg); }
+  }
+  .scene-card .ground {
+    height: 30%;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.15));
+    position: relative;
+  }
+  .scene-info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .scene-info h2 { font-size: 32px; font-weight: 800; margin-bottom: 4px; }
+  .scene-info p { font-size: 16px; opacity: 0.95; }
+
+  /* 三个场景的背景 */
+  .scene-savanna {
+    background: linear-gradient(180deg,
+      #fef3c7 0%,
+      #fde68a 35%,
+      #fbbf24 60%,
+      #d97706 90%);
+  }
+  .scene-rainforest {
+    background: linear-gradient(180deg,
+      #a7f3d0 0%,
+      #34d399 30%,
+      #059669 70%,
+      #064e3b 100%);
+  }
+  .scene-antarctic {
+    background: linear-gradient(180deg,
+      #dbeafe 0%,
+      #93c5fd 35%,
+      #e0f2fe 70%,
+      #f8fafc 100%);
+  }
+
+  /* ============ 右侧问答 ============ */
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .question-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 24px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    border: 3px solid #fde68a;
+  }
+  .question-prompt {
+    font-size: 18px;
+    color: #6b7280;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .question-sentence {
+    font-size: 22px;
+    line-height: 2.4;
+    font-weight: 600;
+    color: #111827;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .blank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 130px;
+    height: 64px;
+    padding: 4px 8px;
+    border: 3px dashed #cbd5e1;
+    border-radius: 14px;
+    background: #f8fafc;
+    transition: all 0.2s;
+    vertical-align: middle;
+    position: relative;
+  }
+  .blank.drag-over {
+    border-color: #f59e0b;
+    background: #fef3c7;
+    transform: scale(1.05);
+  }
+  .blank.filled {
+    border-style: solid;
+    border-color: #e5e7eb;
+    background: white;
+    padding: 0;
+  }
+  .blank.correct {
+    border-color: #10b981;
+    background: #d1fae5;
+    animation: pop 0.4s ease;
+  }
+  .blank.wrong {
+    border-color: #ef4444;
+    background: #fee2e2;
+    animation: shake 0.4s ease;
+  }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  /* ============ 动物卡片池 ============ */
+  .pool-card {
+    background: white;
+    border-radius: 20px;
+    padding: 18px 22px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    border: 3px solid #bae6fd;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .pool-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0369a1;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    overflow-y: auto;
+    flex: 1;
+    align-content: flex-start;
+    padding: 4px;
+  }
+  .animal {
+    width: 110px;
+    height: 110px;
+    background: linear-gradient(135deg, #ffffff, #f1f5f9);
+    border: 3px solid #e2e8f0;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    transition: transform 0.15s, box-shadow 0.15s;
+    touch-action: none;
+    user-select: none;
+    position: relative;
+  }
+  .animal:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+  .animal:active { cursor: grabbing; }
+  .animal .emoji { font-size: 50px; line-height: 1; margin-bottom: 4px; }
+  .animal .name { font-size: 14px; font-weight: 700; color: #334155; }
+  .animal.dragging {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+  .animal.in-blank {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+  }
+  .animal.in-blank .emoji { font-size: 38px; margin-bottom: 0; }
+  .animal.in-blank .name { font-size: 13px; }
+
+  /* 拖拽时的“幽灵”元素 */
+  .ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  }
+
+  /* ============ 控制按钮 ============ */
+  .actions {
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg,#10b981,#059669);
+    color: white;
+    box-shadow: 0 4px 14px rgba(16,185,129,0.4);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(16,185,129,0.5); }
+  .btn-primary:disabled {
+    background: #cbd5e1;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-secondary {
+    background: white;
+    color: #475569;
+    border: 2px solid #cbd5e1;
+  }
+  .btn-secondary:hover { background: #f1f5f9; }
+
+  /* ============ 反馈弹窗 ============ */
+  .feedback-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+  }
+  .feedback-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .feedback-box {
+    background: white;
+    border-radius: 28px;
+    padding: 36px 44px;
+    max-width: 480px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: bounceIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes bounceIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .feedback-icon { font-size: 90px; margin-bottom: 12px; }
+  .feedback-title {
+    font-size: 30px;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+  .feedback-title.success { color: #059669; }
+  .feedback-title.fail { color: #dc2626; }
+  .feedback-msg {
+    font-size: 17px;
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .feedback-msg .hl { color: #dc2626; font-weight: 700; }
+  .feedback-msg .ok { color: #059669; font-weight: 700; }
+  .feedback-actions { display: flex; gap: 10px; justify-content: center; }
+  .feedback-actions .btn { flex: 0 0 auto; padding: 12px 24px; }
+
+  /* 撒花 */
+  .confetti {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+    z-index: 9998;
+    animation: confettiFall 2.5s linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-100vh) rotate(0); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* 响应式 */
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; height: auto; overflow-y: auto; }
+    .scene-card { min-height: 240px; }
+    html, body { overflow: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="title">🌍 小小自然探险家</div>
+  <div class="scene-selector" id="sceneSelector"></div>
+</div>
+
+<div class="main">
+  <!-- 左侧：场景 -->
+  <div class="scene-card" id="sceneCard">
+    <div class="scene-emojis" id="sceneEmojis"></div>
+    <div class="scene-info">
+      <h2 id="sceneTitle">非洲草原</h2>
+      <p id="sceneDesc">广阔的金色草原，是众多大型动物的家园。</p>
+    </div>
+  </div>
+
+  <!-- 右侧：题目 + 动物池 -->
+  <div class="panel">
+    <div class="question-card">
+      <div class="question-prompt">📝 看一看，下列哪些动物生活在这里？</div>
+      <div class="question-sentence" id="questionSentence"></div>
+    </div>
+
+    <div class="pool-card">
+      <div class="pool-title">🎯 把动物拖到横线上（共需 3 个）</div>
+      <div class="pool" id="animalPool"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" id="resetBtn">🔄 重新开始</button>
+      <button class="btn btn-primary" id="submitBtn" disabled>✅ 提交答案</button>
+    </div>
+  </div>
+</div>
+
+<!-- 反馈弹窗 -->
+<div class="feedback-overlay" id="feedbackOverlay">
+  <div class="feedback-box">
+    <div class="feedback-icon" id="feedbackIcon">🎉</div>
+    <div class="feedback-title" id="feedbackTitle">太棒了！</div>
+    <div class="feedback-msg" id="feedbackMsg"></div>
+    <div class="feedback-actions">
+      <button class="btn btn-secondary" id="tryAgainBtn">再试一次</button>
+      <button class="btn btn-primary" id="nextBtn">下一关 →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== 数据 ===================== */
+const SCENES = {
+  savanna: {
+    name: "非洲草原",
+    desc: "广阔的金色草原，是众多大型动物的家园。",
+    cardClass: "scene-savanna",
+    emojis: [
+      { e: "☀️", x: 80, y: 8 },
+      { e: "🌳", x: 12, y: 55 },
+      { e: "🌾", x: 70, y: 75 },
+      { e: "🌾", x: 30, y: 80 },
+      { e: "☁️", x: 25, y: 12 },
+    ],
+    sentence: ["在非洲草原上，常常能看到", "blank", "、", "blank", "和", "blank", "等动物。"],
+    correct: ["lion", "elephant", "giraffe", "zebra"],
+    options: ["lion","elephant","giraffe","zebra","penguin","polar_bear","panda"]
+  },
+  rainforest: {
+    name: "亚马逊雨林",
+    desc: "潮湿茂密的热带雨林，藏着许多奇妙的生物。",
+    cardClass: "scene-rainforest",
+    emojis: [
+      { e: "🌴", x: 8, y: 20 },
+      { e: "🌳", x: 78, y: 15 },
+      { e: "🌿", x: 20, y: 75 },
+      { e: "🌺", x: 85, y: 70 },
+      { e: "🌧️", x: 50, y: 8 },
+    ],
+    sentence: ["亚马逊雨林里，住着", "blank", "、", "blank", "和", "blank", "等动物。"],
+    correct: ["sloth", "macaw", "toucan", "jaguar"],
+    options: ["sloth","macaw","toucan","jaguar","camel","kangaroo","polar_bear"]
+  },
+  antarctic: {
+    name: "南极",
+    desc: "冰天雪地的极地世界，只有最坚强的动物才能生存。",
+    cardClass: "scene-antarctic",
+    emojis: [
+      { e: "❄️", x: 20, y: 15 },
+      { e: "❄️", x: 70, y: 25 },
+      { e: "🏔️", x: 8, y: 50 },
+      { e: "🧊", x: 75, y: 70 },
+      { e: "❄️", x: 50, y: 8 },
+    ],
+    sentence: ["在寒冷的南极，可以见到", "blank", "、", "blank", "和", "blank", "等动物。"],
+    correct: ["penguin", "seal", "whale", "albatross"],
+    options: ["penguin","seal","whale","albatross","polar_bear","lion","crocodile"]
+  }
+};
+
+const ANIMALS = {
+  lion:       { name: "狮子",     emoji: "🦁" },
+  elephant:   { name: "大象",     emoji: "🐘" },
+  giraffe:    { name: "长颈鹿",   emoji: "🦒" },
+  zebra:      { name: "斑马",     emoji: "🦓" },
+  sloth:      { name: "树懒",     emoji: "🦥" },
+  macaw:      { name: "金刚鹦鹉", emoji: "🦜" },
+  toucan:     { name: "巨嘴鸟",   emoji: "🐦" },
+  jaguar:     { name: "美洲豹",   emoji: "🐆" },
+  penguin:    { name: "企鹅",     emoji: "🐧" },
+  seal:       { name: "海豹",     emoji: "🦭" },
+  whale:      { name: "鲸鱼",     emoji: "🐋" },
+  albatross:  { name: "信天翁",   emoji: "🕊️" },
+  polar_bear: { name: "北极熊",   emoji: "🐻‍❄️" },
+  panda:      { name: "熊猫",     emoji: "🐼" },
+  camel:      { name: "骆驼",     emoji: "🐪" },
+  kangaroo:   { name: "袋鼠",     emoji: "🦘" },
+  crocodile:  { name: "鳄鱼",     emoji: "🐊" }
+};
+
+/* 错误时给出的小提示 */
+const HINTS = {
+  polar_bear: "北极熊住在北极圈，南极是没有北极熊的哦！",
+  panda:      "熊猫只生活在中国的竹林里。",
+  camel:      "骆驼喜欢沙漠，雨林太潮湿啦。",
+  kangaroo:   "袋鼠是澳大利亚的特产。",
+  lion:       "狮子住在草原上，不是水里也不是冰上。",
+  crocodile:  "鳄鱼喜欢温暖的水域，南极可冷不行。",
+  penguin:    "企鹅生活在南极，不是这里。",
+  zebra:      "斑马是草原动物，不是雨林居民。",
+  giraffe:    "长颈鹿生活在非洲草原。",
+  elephant:   "大象通常生活在草原或亚洲森林。"
+};
+
+/* ===================== 状态 ===================== */
+let currentScene = "savanna";
+let blanks = [];     // [{el, animalKey}]
+let pool = [];       // 动物池里剩下的 keys
+let dragState = null;
+
+/* ===================== 工具 ===================== */
+function $(id) { return document.getElementById(id); }
+function shuffle(a) {
+  const r = a.slice();
+  for (let i = r.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
+}
+
+/* ===================== 渲染 ===================== */
+function buildSceneSelector() {
+  const sel = $("sceneSelector");
+  sel.innerHTML = "";
+  Object.entries(SCENES).forEach(([key, s]) => {
+    const b = document.createElement("button");
+    b.className = "scene-btn" + (key === currentScene ? " active" : "");
+    b.textContent = s.name;
+    b.onclick = () => { currentScene = key; loadScene(); };
+    sel.appendChild(b);
+  });
+}
+
+function loadScene() {
+  const scene = SCENES[currentScene];
+
+  // 切换场景背景与装饰
+  const card = $("sceneCard");
+  card.className = "scene-card " + scene.cardClass;
+  $("sceneTitle").textContent = scene.name;
+  $("sceneDesc").textContent = scene.desc;
+
+  const fx = $("sceneEmojis");
+  fx.innerHTML = "";
+  scene.emojis.forEach((it, idx) => {
+    const span = document.createElement("span");
+    span.className = "floater";
+    span.textContent = it.e;
+    span.style.left = it.x + "%";
+    span.style.top = it.y + "%";
+    span.style.animationDelay = (idx * 0.4) + "s";
+    fx.appendChild(span);
+  });
+
+  // 渲染题目
+  const sent = $("questionSentence");
+  sent.innerHTML = "";
+  blanks = [];
+  scene.sentence.forEach(part => {
+    if (part === "blank") {
+      const b = document.createElement("span");
+      b.className = "blank";
+      b.dataset.idx = blanks.length;
+      sent.appendChild(b);
+      blanks.push({ el: b, animalKey: null });
+      attachDropEvents(b);
+    } else {
+      const t = document.createTextNode(part);
+      sent.appendChild(t);
+    }
+  });
+
+  // 渲染动物池
+  pool = shuffle(scene.options);
+  renderPool();
+
+  // 重置按钮 / 隐藏弹窗
+  buildSceneSelector();
+  $("submitBtn").disabled = true;
+  $("feedbackOverlay").classList.remove("show");
+}
+
+function renderPool() {
+  const p = $("animalPool");
+  p.innerHTML = "";
+  pool.forEach(key => {
+    p.appendChild(makeAnimalCard(key, false));
+  });
+}
+
+function makeAnimalCard(key, inBlank) {
+  const a = ANIMALS[key];
+  const el = document.createElement("div");
+  el.className = "animal" + (inBlank ? " in-blank" : "");
+  el.dataset.key = key;
+  el.innerHTML = `<div class="emoji">${a.emoji}</div><div class="name">${a.name}</div>`;
+  attachDragEvents(el);
+  return el;
+}
+
+/* ===================== 拖拽（自定义实现，兼容鼠标 & 触屏） ===================== */
+function attachDragEvents(el) {
+  el.addEventListener("mousedown", onDragStart);
+  el.addEventListener("touchstart", onDragStart, { passive: false });
+}
+function attachDropEvents(blank) {
+  // 仅做高亮提示，逻辑在 onDragMove/End 中处理
+}
+
+function onDragStart(e) {
+  e.preventDefault();
+  const target = e.currentTarget;
+  const isTouch = e.type === "touchstart";
+  const point = isTouch ? e.touches[0] : e;
+
+  // 创建幽灵元素
+  const rect = target.getBoundingClientRect();
+  const ghost = target.cloneNode(true);
+  ghost.classList.add("ghost");
+  ghost.style.width = rect.width + "px";
+  ghost.style.height = rect.height + "px";
+  ghost.style.left = point.clientX + "px";
+  ghost.style.top = point.clientY + "px";
+  document.body.appendChild(ghost);
+
+  target.classList.add("dragging");
+
+  dragState = {
+    el: target,
+    ghost,
+    isTouch,
+    fromBlankIdx: target.parentElement.classList.contains("blank")
+      ? Number(target.parentElement.dataset.idx)
+      : null,
+    key: target.dataset.key
+  };
+
+  if (isTouch) {
+    document.addEventListener("touchmove", onDragMove, { passive: false });
+    document.addEventListener("touchend", onDragEnd);
+  } else {
+    document.addEventListener("mousemove", onDragMove);
+    document.addEventListener("mouseup", onDragEnd);
+  }
+}
+
+function onDragMove(e) {
+  if (!dragState) return;
+  e.preventDefault();
+  const point = e.type === "touchmove" ? e.touches[0] : e;
+  dragState.ghost.style.left = point.clientX + "px";
+  dragState.ghost.style.top = point.clientY + "px";
+
+  // 高亮当前覆盖的横线
+  document.querySelectorAll(".blank").forEach(b => b.classList.remove("drag-over"));
+  const over = getBlankUnderPoint(point.clientX, point.clientY);
+  if (over) over.classList.add("drag-over");
+}
+
+function onDragEnd(e) {
+  if (!dragState) return;
+  const point = e.type === "touchend"
+    ? (e.changedTouches[0])
+    : e;
+  const over = getBlankUnderPoint(point.clientX, point.clientY);
+  document.querySelectorAll(".blank").forEach(b => b.classList.remove("drag-over"));
+
+  const { el, ghost, fromBlankIdx, key } = dragState;
+  ghost.remove();
+  el.classList.remove("dragging");
+
+  if (over) {
+    const targetIdx = Number(over.dataset.idx);
+    placeAnimal(key, targetIdx, fromBlankIdx);
+  } else {
+    // 拖回池里：如果原本在 blank 里 -> 移除并放回池
+    if (fromBlankIdx !== null) {
+      removeFromBlank(fromBlankIdx);
+    }
+    // 否则：什么也不做，原位置保留
+  }
+
+  document.removeEventListener("mousemove", onDragMove);
+  document.removeEventListener("mouseup", onDragEnd);
+  document.removeEventListener("touchmove", onDragMove);
+  document.removeEventListener("touchend", onDragEnd);
+
+  dragState = null;
+  refreshSubmitState();
+}
+
+function getBlankUnderPoint(x, y) {
+  return document.querySelectorAll(".blank") &&
+    Array.from(document.querySelectorAll(".blank")).find(b => {
+      const r = b.getBoundingClientRect();
+      return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+    });
+}
+
+/* ===================== 放置 / 移除 ===================== */
+function placeAnimal(key, targetIdx, fromBlankIdx) {
+  const targetSlot = blanks[targetIdx];
+
+  // 如果 target 已经有动物：把它替换掉（旧的回到池或交换）
+  const existingKey = targetSlot.animalKey;
+
+  // 来自池里的拖动
+  if (fromBlankIdx === null) {
+    // 从池里移除
+    pool = pool.filter(k => k !== key);
+    if (existingKey) pool.push(existingKey);
+  } else {
+    // 来自另一个空格
+    if (fromBlankIdx === targetIdx) return; // 拖回自身
+    if (existingKey) {
+      // 交换
+      blanks[fromBlankIdx].animalKey = existingKey;
+    } else {
+      blanks[fromBlankIdx].animalKey = null;
+    }
+  }
+
+  targetSlot.animalKey = key;
+  redrawBlanksAndPool();
+}
+
+function removeFromBlank(idx) {
+  const slot = blanks[idx];
+  if (!slot.animalKey) return;
+  pool.push(slot.animalKey);
+  slot.animalKey = null;
+  redrawBlanksAndPool();
+}
+
+function redrawBlanksAndPool() {
+  // 重画 blanks
+  blanks.forEach(slot => {
+    slot.el.classList.remove("correct","wrong","drag-over");
+    slot.el.innerHTML = "";
+    if (slot.animalKey) {
+      slot.el.classList.add("filled");
+      slot.el.appendChild(makeAnimalCard(slot.animalKey, true));
+    } else {
+      slot.el.classList.remove("filled");
+    }
+  });
+  // 重画池
+  renderPool();
+}
+
+function refreshSubmitState() {
+  const filled = blanks.every(b => b.animalKey);
+  $("submitBtn").disabled = !filled;
+}
+
+/* ===================== 提交 / 反馈 ===================== */
+function submit() {
+  const scene = SCENES[currentScene];
+  let allCorrect = true;
+  const wrongOnes = [];
+  const rightOnes = [];
+
+  blanks.forEach(slot => {
+    const ok = scene.correct.includes(slot.animalKey);
+    slot.el.classList.remove("filled");
+    if (ok) {
+      slot.el.classList.add("correct");
+      rightOnes.push(slot.animalKey);
+    } else {
+      slot.el.classList.add("wrong");
+      wrongOnes.push(slot.animalKey);
+      allCorrect = false;
+    }
+  });
+
+  setTimeout(() => showFeedback(allCorrect, wrongOnes, rightOnes), 700);
+}
+
+function showFeedback(allCorrect, wrongOnes, rightOnes) {
+  const overlay = $("feedbackOverlay");
+  const icon = $("feedbackIcon");
+  const title = $("feedbackTitle");
+  const msg = $("feedbackMsg");
+
+  if (allCorrect) {
+    icon.textContent = ["🎉","🌟","🏆","🎊","👏"][Math.floor(Math.random()*5)];
+    title.textContent = "太棒了，全部正确！";
+    title.className = "feedback-title success";
+    const praises = [
+      "你真是个出色的小小自然探险家！🌿",
+      "完美！你已经掌握了这个生态系统的居民。✨",
+      "厉害！连科学家都要给你点赞！👍",
+      "全对！你的科学知识真扎实。📚"
+    ];
+    msg.innerHTML = praises[Math.floor(Math.random()*praises.length)];
+    launchConfetti();
+  } else {
+    icon.textContent = "🤔";
+    title.textContent = "再想一想哦~";
+    title.className = "feedback-title fail";
+
+    const wrongHints = wrongOnes.map(k => {
+      const a = ANIMALS[k];
+      const h = HINTS[k] || "再观察一下这个场景吧。";
+      return `${a.emoji} <span class="hl">${a.name}</span>：${h}`;
+    }).join("<br>");
+
+    let okPart = "";
+    if (rightOnes.length > 0) {
+      const okList = rightOnes.map(k => `${ANIMALS[k].emoji} <span class="ok">${ANIMALS[k].name}</span>`).join("、");
+      okPart = `做得不错的部分：${okList}<br><br>`;
+    }
+    msg.innerHTML = okPart + "<b>需要再想想：</b><br>" + wrongHints;
+  }
+
+  overlay.classList.add("show");
+}
+
+function launchConfetti() {
+  const colors = ["#f59e0b","#ef4444","#10b981","#3b82f6","#8b5cf6","#ec4899"];
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDelay = Math.random() * 0.6 + "s";
+    c.style.borderRadius = Math.random() < 0.5 ? "50%" : "2px";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 3500);
+  }
+}
+
+/* ===================== 控制 ===================== */
+$("submitBtn").addEventListener("click", submit);
+$("resetBtn").addEventListener("click", loadScene);
+$("tryAgainBtn").addEventListener("click", () => {
+  $("feedbackOverlay").classList.remove("show");
+  // 把所有错误的动物拿回池里，正确的留在格子里
+  const scene = SCENES[currentScene];
+  blanks.forEach(slot => {
+    if (slot.animalKey && !scene.correct.includes(slot.animalKey)) {
+      pool.push(slot.animalKey);
+      slot.animalKey = null;
+    }
+  });
+  redrawBlanksAndPool();
+  refreshSubmitState();
+});
+$("nextBtn").addEventListener("click", () => {
+  $("feedbackOverlay").classList.remove("show");
+  const keys = Object.keys(SCENES);
+  const idx = keys.indexOf(currentScene);
+  currentScene = keys[(idx + 1) % keys.length];
+  loadScene();
+});
+
+/* 启动 */
+loadScene();
+</script>
+</body>
+</html>
