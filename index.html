@@ -143,6 +143,20 @@
       #ea580c 65%,
       #7c2d12 100%);
   }
+  .scene-zoo {
+    background: linear-gradient(180deg,
+      #fef9c3 0%,
+      #d9f99d 35%,
+      #84cc16 70%,
+      #3f6212 100%);
+  }
+  .scene-sky {
+    background: linear-gradient(180deg,
+      #e0f2fe 0%,
+      #7dd3fc 35%,
+      #38bdf8 70%,
+      #0369a1 100%);
+  }
 
   /* ============ 右侧问答 ============ */
   .panel {
@@ -528,6 +542,36 @@ const SCENES = {
     sentence: ["在炎热的沙漠中，能找到", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
     correct: ["camel", "scorpion", "snake", "fennec_fox"],
     options: ["camel","scorpion","snake","fennec_fox","penguin","whale","sloth"]
+  },
+  zoo: {
+    name: "动物园",
+    desc: "动物园里有来自世界各地的动物，是观察和学习的好地方。",
+    cardClass: "scene-zoo",
+    emojis: [
+      { e: "🌳", x: 10, y: 30 },
+      { e: "🌳", x: 80, y: 35 },
+      { e: "🎈", x: 25, y: 12 },
+      { e: "🍃", x: 60, y: 70 },
+      { e: "☀️", x: 75, y: 10 },
+    ],
+    sentence: ["在动物园里，常常能看到", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
+    correct: ["panda", "tiger", "giraffe", "monkey"],
+    options: ["panda","tiger","giraffe","monkey","whale","octopus","shark"]
+  },
+  sky: {
+    name: "天空",
+    desc: "高高的蓝天白云间，许多动物展开翅膀自由飞翔。",
+    cardClass: "scene-sky",
+    emojis: [
+      { e: "☁️", x: 15, y: 25 },
+      { e: "☁️", x: 70, y: 18 },
+      { e: "☁️", x: 40, y: 60 },
+      { e: "☀️", x: 85, y: 45 },
+      { e: "🌈", x: 12, y: 70 },
+    ],
+    sentence: ["在天空中飞翔的有", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
+    correct: ["eagle", "butterfly", "bee", "bat"],
+    options: ["eagle","butterfly","bee","bat","elephant","whale","sea_turtle"]
   }
 };
 
@@ -556,7 +600,12 @@ const ANIMALS = {
   tiger:      { name: "老虎",     emoji: "🐅" },
   scorpion:   { name: "蝎子",     emoji: "🦂" },
   snake:      { name: "蛇",       emoji: "🐍" },
-  fennec_fox: { name: "沙漠狐",   emoji: "🦊" }
+  fennec_fox: { name: "沙漠狐",   emoji: "🦊" },
+  monkey:     { name: "猴子",     emoji: "🐒" },
+  eagle:      { name: "老鹰",     emoji: "🦅" },
+  butterfly:  { name: "蝴蝶",     emoji: "🦋" },
+  bee:        { name: "蜜蜂",     emoji: "🐝" },
+  bat:        { name: "蝙蝠",     emoji: "🦇" }
 };
 
 /* 错误时给出的小提示 —— 描述动物真实的栖息地，便于在任何场景作干扰项时使用 */
@@ -582,7 +631,12 @@ const HINTS = {
   fennec_fox: "沙漠狐是沙漠里的小精灵。",
   whale:      "鲸鱼是海洋里的庞然大物。",
   seal:       "海豹生活在寒冷的极地海域。",
-  albatross:  "信天翁在南极的海面上飞翔。"
+  albatross:  "信天翁在南极的海面上飞翔。",
+  monkey:     "猴子住在森林里和动物园里。",
+  eagle:      "老鹰是天空中的猛禽，会在高空翱翔。",
+  butterfly:  "蝴蝶在天空和花丛之间翩翩起舞。",
+  bee:        "蜜蜂会飞，专门去花朵上采蜜。",
+  bat:        "蝙蝠是会飞的哺乳动物，常出没在夜空。"
 };
 
 /* ===================== 状态 ===================== */
