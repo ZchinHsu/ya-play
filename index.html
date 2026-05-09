@@ -129,6 +129,20 @@
       #e0f2fe 70%,
       #f8fafc 100%);
   }
+  .scene-ocean {
+    background: linear-gradient(180deg,
+      #bae6fd 0%,
+      #38bdf8 30%,
+      #0284c7 65%,
+      #0c4a6e 100%);
+  }
+  .scene-desert {
+    background: linear-gradient(180deg,
+      #fde68a 0%,
+      #fbbf24 25%,
+      #ea580c 65%,
+      #7c2d12 100%);
+  }
 
   /* ============ 右侧问答 ============ */
   .panel {
@@ -377,6 +391,15 @@
     .main { grid-template-columns: 1fr; height: auto; overflow-y: auto; }
     .scene-card { min-height: 240px; }
     html, body { overflow: auto; }
+    .topbar {
+      height: auto;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      gap: 8px;
+    }
+    .title { font-size: 22px; letter-spacing: 1px; }
+    .scene-selector { flex-wrap: wrap; gap: 6px; }
+    .scene-btn { padding: 6px 12px; font-size: 13px; }
   }
 </style>
 </head>
@@ -476,6 +499,35 @@ const SCENES = {
     sentence: ["在寒冷的南极，可以见到", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
     correct: ["penguin", "seal", "whale", "albatross"],
     options: ["penguin","seal","whale","albatross","polar_bear","lion","crocodile"]
+  },
+  ocean: {
+    name: "海洋",
+    desc: "蔚蓝深邃的大海，是地球上最大的生命家园。",
+    cardClass: "scene-ocean",
+    emojis: [
+      { e: "☀️", x: 85, y: 8 },
+      { e: "🌊", x: 12, y: 45 },
+      { e: "🌊", x: 65, y: 50 },
+      { e: "🪸", x: 75, y: 80 },
+      { e: "🐚", x: 22, y: 82 },
+    ],
+    sentence: ["在大海里，自由游动的有", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
+    correct: ["dolphin", "shark", "octopus", "sea_turtle"],
+    options: ["dolphin","shark","octopus","sea_turtle","tiger","camel","kangaroo"]
+  },
+  desert: {
+    name: "沙漠",
+    desc: "炎热干燥、风沙漫天，只有耐渴的动物才能生存。",
+    cardClass: "scene-desert",
+    emojis: [
+      { e: "☀️", x: 78, y: 10 },
+      { e: "🌵", x: 15, y: 55 },
+      { e: "🌵", x: 68, y: 60 },
+      { e: "🏜️", x: 40, y: 80 },
+    ],
+    sentence: ["在炎热的沙漠中，能找到", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
+    correct: ["camel", "scorpion", "snake", "fennec_fox"],
+    options: ["camel","scorpion","snake","fennec_fox","penguin","whale","sloth"]
   }
 };
 
@@ -496,21 +548,41 @@ const ANIMALS = {
   panda:      { name: "熊猫",     emoji: "🐼" },
   camel:      { name: "骆驼",     emoji: "🐪" },
   kangaroo:   { name: "袋鼠",     emoji: "🦘" },
-  crocodile:  { name: "鳄鱼",     emoji: "🐊" }
+  crocodile:  { name: "鳄鱼",     emoji: "🐊" },
+  dolphin:    { name: "海豚",     emoji: "🐬" },
+  shark:      { name: "鲨鱼",     emoji: "🦈" },
+  octopus:    { name: "章鱼",     emoji: "🐙" },
+  sea_turtle: { name: "海龟",     emoji: "🐢" },
+  tiger:      { name: "老虎",     emoji: "🐅" },
+  scorpion:   { name: "蝎子",     emoji: "🦂" },
+  snake:      { name: "蛇",       emoji: "🐍" },
+  fennec_fox: { name: "沙漠狐",   emoji: "🦊" }
 };
 
-/* 错误时给出的小提示 */
+/* 错误时给出的小提示 —— 描述动物真实的栖息地，便于在任何场景作干扰项时使用 */
 const HINTS = {
-  polar_bear: "北极熊住在北极圈，南极是没有北极熊的哦！",
+  polar_bear: "北极熊住在北极的浮冰上，是不是放错地方啦？",
   panda:      "熊猫只生活在中国的竹林里。",
-  camel:      "骆驼喜欢沙漠，雨林太潮湿啦。",
-  kangaroo:   "袋鼠是澳大利亚的特产。",
-  lion:       "狮子住在草原上，不是水里也不是冰上。",
-  crocodile:  "鳄鱼喜欢温暖的水域，南极可冷不行。",
-  penguin:    "企鹅生活在南极，不是这里。",
-  zebra:      "斑马是草原动物，不是雨林居民。",
+  camel:      "骆驼是沙漠居民，喜欢炎热干燥的地方。",
+  kangaroo:   "袋鼠是澳大利亚草原的特产。",
+  lion:       "狮子住在非洲草原，不是水里也不是冰上。",
+  crocodile:  "鳄鱼喜欢温暖的河流和沼泽。",
+  penguin:    "企鹅生活在寒冷的南极。",
+  zebra:      "斑马是非洲草原动物。",
   giraffe:    "长颈鹿生活在非洲草原。",
-  elephant:   "大象通常生活在草原或亚洲森林。"
+  elephant:   "大象通常生活在草原或亚洲森林。",
+  tiger:      "老虎住在亚洲的森林里。",
+  sloth:      "树懒住在亚马逊雨林的树上。",
+  dolphin:    "海豚生活在海洋里。",
+  shark:      "鲨鱼是海洋里的猎手。",
+  octopus:    "章鱼住在海里，可不是陆地动物。",
+  sea_turtle: "海龟在大海里游泳。",
+  scorpion:   "蝎子喜欢炎热干燥的沙漠。",
+  snake:      "这条蛇可不太适应这里的环境。",
+  fennec_fox: "沙漠狐是沙漠里的小精灵。",
+  whale:      "鲸鱼是海洋里的庞然大物。",
+  seal:       "海豹生活在寒冷的极地海域。",
+  albatross:  "信天翁在南极的海面上飞翔。"
 };
 
 /* ===================== 状态 ===================== */
