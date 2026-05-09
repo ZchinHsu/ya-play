@@ -482,7 +482,7 @@ const SCENES = {
     ],
     sentence: ["在非洲草原上，常常能看到", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
     correct: ["lion", "elephant", "giraffe", "zebra"],
-    options: ["lion","elephant","giraffe","zebra","penguin","polar_bear","panda"]
+    options: ["lion","elephant","giraffe","zebra","tiger","jaguar","gorilla","kangaroo","polar_bear"]
   },
   rainforest: {
     name: "亚马逊雨林",
@@ -497,7 +497,7 @@ const SCENES = {
     ],
     sentence: ["亚马逊雨林里，住着", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
     correct: ["sloth", "macaw", "toucan", "jaguar"],
-    options: ["sloth","macaw","toucan","jaguar","camel","kangaroo","polar_bear"]
+    options: ["sloth","macaw","toucan","jaguar","tiger","gorilla","orangutan","lion","camel"]
   },
   antarctic: {
     name: "南极",
@@ -512,7 +512,7 @@ const SCENES = {
     ],
     sentence: ["在寒冷的南极，可以见到", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
     correct: ["penguin", "seal", "whale", "albatross"],
-    options: ["penguin","seal","whale","albatross","polar_bear","lion","crocodile"]
+    options: ["penguin","seal","whale","albatross","polar_bear","reindeer","panda","crocodile","lion"]
   },
   ocean: {
     name: "海洋",
@@ -527,7 +527,7 @@ const SCENES = {
     ],
     sentence: ["在大海里，自由游动的有", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
     correct: ["dolphin", "shark", "octopus", "sea_turtle"],
-    options: ["dolphin","shark","octopus","sea_turtle","tiger","camel","kangaroo"]
+    options: ["dolphin","shark","octopus","sea_turtle","hippo","crocodile","bat","monkey","elephant"]
   },
   desert: {
     name: "沙漠",
@@ -541,7 +541,7 @@ const SCENES = {
     ],
     sentence: ["在炎热的沙漠中，能找到", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
     correct: ["camel", "scorpion", "snake", "fennec_fox"],
-    options: ["camel","scorpion","snake","fennec_fox","penguin","whale","sloth"]
+    options: ["camel","scorpion","snake","fennec_fox","penguin","polar_bear","whale","hippo","sloth"]
   },
   zoo: {
     name: "动物园",
@@ -556,7 +556,7 @@ const SCENES = {
     ],
     sentence: ["在动物园里，常常能看到", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
     correct: ["panda", "tiger", "giraffe", "monkey"],
-    options: ["panda","tiger","giraffe","monkey","whale","octopus","shark"]
+    options: ["panda","tiger","giraffe","monkey","whale","shark","octopus","dolphin","jellyfish"]
   },
   sky: {
     name: "天空",
@@ -571,7 +571,7 @@ const SCENES = {
     ],
     sentence: ["在天空中飞翔的有", "blank", "、", "blank", "、", "blank", "和", "blank", "等动物。"],
     correct: ["eagle", "butterfly", "bee", "bat"],
-    options: ["eagle","butterfly","bee","bat","elephant","whale","sea_turtle"]
+    options: ["eagle","butterfly","bee","bat","penguin","elephant","whale","sea_turtle","crocodile"]
   }
 };
 
@@ -605,7 +605,12 @@ const ANIMALS = {
   eagle:      { name: "老鹰",     emoji: "🦅" },
   butterfly:  { name: "蝴蝶",     emoji: "🦋" },
   bee:        { name: "蜜蜂",     emoji: "🐝" },
-  bat:        { name: "蝙蝠",     emoji: "🦇" }
+  bat:        { name: "蝙蝠",     emoji: "🦇" },
+  gorilla:    { name: "大猩猩",   emoji: "🦍" },
+  orangutan:  { name: "红毛猩猩", emoji: "🦧" },
+  reindeer:   { name: "驯鹿",     emoji: "🦌" },
+  hippo:      { name: "河马",     emoji: "🦛" },
+  jellyfish:  { name: "水母",     emoji: "🪼" }
 };
 
 /* 错误时给出的小提示 —— 描述动物真实的栖息地，便于在任何场景作干扰项时使用 */
@@ -636,7 +641,12 @@ const HINTS = {
   eagle:      "老鹰是天空中的猛禽，会在高空翱翔。",
   butterfly:  "蝴蝶在天空和花丛之间翩翩起舞。",
   bee:        "蜜蜂会飞，专门去花朵上采蜜。",
-  bat:        "蝙蝠是会飞的哺乳动物，常出没在夜空。"
+  bat:        "蝙蝠是会飞的哺乳动物，常出没在夜空。",
+  gorilla:    "大猩猩生活在非洲中部的雨林里，不是草原哦。",
+  orangutan:  "红毛猩猩生活在东南亚的热带雨林。",
+  reindeer:   "驯鹿生活在北极圈附近的寒冷苔原，不是南极。",
+  hippo:      "河马住在非洲的河流和湖泊里，不是海洋。",
+  jellyfish:  "水母漂浮在海洋里，动物园里见不到。"
 };
 
 /* ===================== 状态 ===================== */
